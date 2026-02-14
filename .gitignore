@@ -7,6 +7,17 @@ dist/
 build/
 coverage/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
 # Misc
 .DS_Store
 .env
@@ -18,3 +29,4 @@ coverage/
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
+*.log
