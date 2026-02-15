@@ -1,40 +1,323 @@
+/* Gen Z / Neubrutalism Theme + Future Motion */
+:root {
+  --bg-color: #FFF8F0;
+  /* Warm Off-White */
+  --primary: #8B5CF6;
+  /* Vivid Violet */
+  --secondary: #FF9F1C;
+  /* Bright Tangerine */
+  --text: #1F2937;
+  /* Dark Grey/Black */
+  --border: #000000;
+  /* Pitch Black */
+  --light-border: #E5E7EB;
+  --success: #10B981;
+  /* Green */
+
+  --shadow-color: #000000;
+  --hard-shadow: 4px 4px 0px 0px var(--shadow-color);
+  --small-shadow: 2px 2px 0px 0px var(--shadow-color);
+
+  --radius: 12px;
+  --border-width: 2px;
+}
+
 body {
-  width: 300px;
-  padding: 0;
+  width: 320px;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  padding: 0;
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--bg-color);
+  background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: var(--text);
+  box-sizing: border-box;
+  overflow: hidden;
+  /* Prevent scrollbars during animations */
 }
 
 .container {
-  padding: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Header & Typography */
+header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 8px;
 }
 
 h1 {
-  font-size: 18px;
-  margin: 0 0 8px 0;
-  color: #1a1a1a;
+  font-weight: 900;
+  font-size: 32px;
+  line-height: 1.1;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  position: relative;
+  display: inline-block;
 }
 
-.status {
-  font-size: 12px;
-  color: #22c55e;
-  margin: 0 0 16px 0;
-  font-weight: 500;
+/* The "Sparkle" is now a floating geometric shape */
+.sparkle {
+  position: absolute;
+  top: -15px;
+  right: 10px;
+  font-size: 24px;
+  animation: float 4s ease-in-out infinite;
+  filter: drop-shadow(2px 2px 0px black);
 }
 
-.info {
-  background: #f5f5f5;
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(10deg) scale(1.1);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 16px;
+  transition: transform 0.2s;
+}
+
+.form-group:focus-within {
+  transform: translateX(4px);
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+  margin-left: 2px;
+}
+
+input {
+  width: 100%;
   padding: 12px;
-  border-radius: 6px;
-  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  background: white;
+  box-sizing: border-box;
+  box-shadow: var(--small-shadow);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.info p {
-  margin: 4px 0;
-  color: #666;
+input:focus {
+  outline: none;
+  transform: scale(1.02);
+  box-shadow: 6px 6px 0px 0px var(--shadow-color);
+  border-color: var(--primary);
 }
 
-#auth-status {
-  font-weight: 600;
-  color: #ef4444;
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: var(--hard-shadow);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px 0px var(--shadow-color);
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px 0px var(--shadow-color);
+}
+
+/* Shine effect on button */
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: 0.5s;
+}
+
+.btn:hover::after {
+  left: 100%;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--secondary);
+  color: black;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--hard-shadow);
+  text-align: center;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.status-card h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #DCFCE7;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: var(--success);
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.info-item {
+  background: white;
+  border: var(--border-width) solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: var(--small-shadow);
+  transition: transform 0.2s;
+}
+
+.info-item:hover {
+  transform: translateY(-3px) rotate(1deg);
+}
+
+.info-item .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #6B7280;
+  margin-bottom: 2px;
+}
+
+.info-item .value {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Loader */
+.loader {
+  font-weight: 900;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: glitch 1s linear infinite;
+}
+
+@keyframes glitch {
+
+  2%,
+  64% {
+    transform: translate(2px, 0) skew(0deg);
+  }
+
+  4%,
+  60% {
+    transform: translate(-2px, 0) skew(0deg);
+  }
+
+  62% {
+    transform: translate(0, 0) skew(5deg);
+  }
 }

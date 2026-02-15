@@ -3,18 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Decision Intelligence System</title>
+  <title>Decision Intelligence</title>
+  <!-- Google Fonts: Nunito for rounded, friendly vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
-    <h1>Decision Intelligence</h1>
-    <p class="status">Extension Active</p>
-    <div class="info">
-      <p>Module 4.1: Decision Capture System</p>
-      <p>Status: <span id="auth-status">Not Authenticated</span></p>
+    
+    <!-- Branding Header -->
+    <header>
+      <h1>Decision<br>Intel</h1>
+      <div class="sparkle">✨</div>
+    </header>
+
+    <!-- Loading View -->
+    <div id="loading-view" class="view">
+      <div class="loader">Loading...</div>
     </div>
+
+    <!-- Login View -->
+    <div id="login-view" class="view hidden">
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter username" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Let's Go 🚀</button>
+      </form>
+    </div>
+
+    <!-- Authenticated View -->
+    <div id="authenticated-view" class="view hidden">
+      
+      <!-- Status Card -->
+      <div class="card status-card">
+        <h2>You're Valid 💅</h2>
+        <div class="status-badge">
+          <span class="dot"></span> Active Tracking
+        </div>
+      </div>
+
+      <!-- Stats / Info -->
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Session</span>
+          <span class="value" id="session-display">--</span>
+        </div>
+        <div class="info-item">
+          <span class="label">User</span>
+          <span class="value" id="user-display">--</span>
+        </div>
+      </div>
+
+      <button id="logout-btn" class="btn btn-secondary">Bye 👋</button>
+    </div>
+
   </div>
-  <script src="popup.js"></script>
+  <script src="popup.js" type="module"></script>
 </body>
 </html>
