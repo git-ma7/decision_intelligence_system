@@ -38,25 +38,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === 'GET_AUTH_STATUS') {
-        // Get both auth and session data to populate the UI
-        chrome.storage.local.get(['auth', 'session'])
-            .then((data) => {
-                const auth = data.auth || {};
-                const session = data.session || {};
+        // ... existing code ...
+        return true;
+    }
 
-                const isAuthenticated = auth.token && auth.expiresAt > Date.now();
+    // Handle incoming event batches from observers
+    if (message.type === 'EVENT_BATCH') {
+        const newEvents = message.payload;
+        chrome.storage.local.get('events').then((data) => {
+            const currentEvents = data.events || [];
+            const updatedEvents = [...currentEvents, ...newEvents];
 
-                sendResponse({
-                    authenticated: isAuthenticated,
-                    userId: auth.userId,
-                    sessionId: session.currentSessionId,
-                    tabCount: session.tabCount
-                });
-            })
-            .catch(err => {
-                console.error('Error getting auth status:', err);
-                sendResponse({ authenticated: false, error: err.message });
+            // Production Pattern: Limit buffer size (e.g., 1000 events)
+            const MAX_EVENTS = 1000;
+            const cappedEvents = updatedEvents.slice(-MAX_EVENTS);
+
+            chrome.storage.local.set({ events: cappedEvents }).then(() => {
+                console.log(`Background: Stored batch of ${newEvents.length} events. Total buffer: ${cappedEvents.length}`);
+                sendResponse({ success: true });
             });
+        }).catch(err => {
+            console.error('Background: Error storing events:', err);
+            sendResponse({ success: false, error: err.message });
+        });
         return true;
     }
 });

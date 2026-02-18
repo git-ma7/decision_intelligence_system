@@ -1,10 +1,11 @@
-// Module 4.1: Decision Capture System
-// Content Script - Page Interaction Observer
-
-console.log('Decision Intelligence content script loaded on:', window.location.href);
-
-// TODO: Implement page interaction tracking
-// - Dwell time measurement
-// - Scroll depth tracking
-// - Click event monitoring
-// - Metadata extraction
+/**
+ * content-script.js: Proxy loader to enable ESM in content scripts.
+ */
+(async () => {
+    try {
+        const src = chrome.runtime.getURL('content/main-module.js');
+        await import(src);
+    } catch (error) {
+        console.error('Decision Intelligence: Module Load Failed', error);
+    }
+})();
