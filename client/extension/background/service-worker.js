@@ -2,6 +2,7 @@
 import { initAuth, login, logout, verifyToken } from './auth.js';
 import { onInstalled, onStartup } from './init.js';
 import { enrichEvent } from './enrichment.js'; // Stage 3: Event Enrichment
+import { assignSession } from './session-manager.js'; // Stage 4: Session Management
 
 console.log('Decision Intelligence System - Module 4.1 initialized');
 
@@ -47,8 +48,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'EVENT_BATCH') {
         const newEvents = message.payload;
 
-        // Stage 3: Enrich each event before storage
-        Promise.all(newEvents.map(event => enrichEvent(event)))
+        // Stage 3 & 4: Enrich and assign sessions to each event before storage
+        Promise.all(newEvents.map(event =>
+            enrichEvent(event)
+                .then(enriched => assignSession(enriched, sender.tab?.id, sender.tab?.windowId))
+        ))
             .then(enrichedEvents => chrome.storage.local.get('events').then((data) => {
                 const currentEvents = data.events || [];
                 const updatedEvents = [...currentEvents, ...enrichedEvents];
