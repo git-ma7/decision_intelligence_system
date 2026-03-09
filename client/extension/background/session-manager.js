@@ -70,13 +70,44 @@ export async function assignSession(event, tabId, windowId) {
     // Fire-and-forget save to storage
     saveSessions();
 
+    // 2. Correlation detection
+    const correlations = detectCorrelation(event, session);
+
+    // Update last category for next correlation
+    session.lastEventCategory = event.category || null;
+
     // Enrich event
     const sessionAge = Math.floor((now - session.sessionStartTimestamp) / 1000);
 
-    return {
+    const enrichedEvent = {
         ...event,
         sessionId: session.sessionId,
         sessionSequence: session.sequence,
         sessionAge: sessionAge
     };
+
+    if (correlations.length > 0) {
+        enrichedEvent.correlations = correlations;
+    }
+
+    return enrichedEvent;
+}
+
+/**
+ * Detect correlations between current event and previous session state.
+ *
+ * @param {Object} event
+ * @param {Object} session
+ * @returns {string[]} Array of correlation tags
+ */
+function detectCorrelation(event, session) {
+    const correlations = [];
+
+    // search -> navigation correlation
+    // If previous event was category 'search' and current event is NOT 'search' (and not null)
+    if (session.lastEventCategory === 'search' && event.category && event.category !== 'search') {
+        correlations.push('search_to_navigation');
+    }
+
+    return correlations;
 }
