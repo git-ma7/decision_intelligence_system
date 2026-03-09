@@ -1,6 +1,7 @@
 // Module 4.1: Decision Capture System - Service Worker
 import { initAuth, login, logout, verifyToken } from './auth.js';
 import { onInstalled, onStartup } from './init.js';
+import { enrichEvent } from './enrichment.js'; // Stage 3: Event Enrichment
 
 console.log('Decision Intelligence System - Module 4.1 initialized');
 
@@ -45,22 +46,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Handle incoming event batches from observers
     if (message.type === 'EVENT_BATCH') {
         const newEvents = message.payload;
-        chrome.storage.local.get('events').then((data) => {
-            const currentEvents = data.events || [];
-            const updatedEvents = [...currentEvents, ...newEvents];
 
-            // Production Pattern: Limit buffer size (e.g., 1000 events)
-            const MAX_EVENTS = 1000;
-            const cappedEvents = updatedEvents.slice(-MAX_EVENTS);
+        // Stage 3: Enrich each event before storage
+        Promise.all(newEvents.map(event => enrichEvent(event)))
+            .then(enrichedEvents => chrome.storage.local.get('events').then((data) => {
+                const currentEvents = data.events || [];
+                const updatedEvents = [...currentEvents, ...enrichedEvents];
 
-            chrome.storage.local.set({ events: cappedEvents }).then(() => {
-                console.log(`Background: Stored batch of ${newEvents.length} events. Total buffer: ${cappedEvents.length}`);
-                sendResponse({ success: true });
+                // Production Pattern: Limit buffer size (FIFO eviction at 1000 events)
+                const MAX_EVENTS = 1000;
+                const cappedEvents = updatedEvents.slice(-MAX_EVENTS);
+
+                return chrome.storage.local.set({ events: cappedEvents }).then(() => {
+                    console.log(`Background: Stored ${enrichedEvents.length} enriched events. Total buffer: ${cappedEvents.length}`);
+                    sendResponse({ success: true });
+                });
+            }))
+            .catch(err => {
+                console.error('Background: Error enriching/storing events:', err);
+                sendResponse({ success: false, error: err.message });
             });
-        }).catch(err => {
-            console.error('Background: Error storing events:', err);
-            sendResponse({ success: false, error: err.message });
-        });
         return true;
     }
 });
