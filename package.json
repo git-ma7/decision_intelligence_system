@@ -1,0 +1,21 @@
+{
+  "name": "dec_int_sys",
+  "version": "1.0.0",
+  "description": "The **Decision Intelligence Platform** is a single-user, professional system designed to observe user digital activity, identify potential decisions, and present structured insights over time.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/git-ma7/decision_intelligence_system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/git-ma7/decision_intelligence_system/issues"
+  },
+  "homepage": "https://github.com/git-ma7/decision_intelligence_system#readme"
+}

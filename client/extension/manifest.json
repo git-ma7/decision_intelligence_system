@@ -27,6 +27,15 @@
                 "content/content-script.js"
             ],
             "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content/metadata-extractor.js"
+            ],
+            "run_at": "document_idle"
         }
     ],
     "action": {
