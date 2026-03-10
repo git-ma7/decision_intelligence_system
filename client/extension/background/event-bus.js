@@ -66,7 +66,19 @@ import('./buffer/event-buffer.js').then(({ addEvent }) => {
     });
 });
 
-eventBus.subscribe('batch-ready', (batch) => {
-    console.log('EventBus: Batch ready received:', batch);
-    // Future Stage: Handle transmission to Module 4.2
+eventBus.subscribe('batch-ready', async (batch) => {
+    console.log('EventBus: Batch ready received, applying privacy pipeline:', batch);
+
+    try {
+        const { scrubBatch } = await import('./privacy/privacy-pipeline.js');
+        const scrubbedBatch = await scrubBatch(batch);
+
+        console.log('EventBus: Batch scrubbed, emitting scrubbed-batch-ready');
+        eventBus.emit('scrubbed-batch-ready', scrubbedBatch);
+    } catch (error) {
+        console.error('EventBus: Privacy scrubbing failed', error);
+        // Fail-safe: Emit the batch even if scrubbing fails? 
+        // Better to not emit it if privacy is a hard requirement.
+        // For now, let's just log.
+    }
 });
