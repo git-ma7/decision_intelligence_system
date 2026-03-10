@@ -14,6 +14,22 @@ const BATCH_TIME_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
 let inMemoryBuffer = [];
 
 /**
+ * Initialize the in-memory buffer from persisted storage.
+ */
+export async function initBuffer() {
+    try {
+        const { events = [] } = await chrome.storage.local.get('events');
+        inMemoryBuffer = events;
+        console.log(`EventBuffer: Initialized with ${inMemoryBuffer.length} persisted events.`);
+
+        // Check if the loaded events already trigger a batch
+        checkBatchTrigger();
+    } catch (error) {
+        console.error('EventBuffer: Failed to initialize from storage', error);
+    }
+}
+
+/**
  * Add an event to the buffer and persist to local storage.
  * @param {Object} event - The event object.
  */

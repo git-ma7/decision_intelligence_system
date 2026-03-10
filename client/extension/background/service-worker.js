@@ -3,6 +3,8 @@ import { initAuth, login, logout, verifyToken } from './auth.js';
 import { onInstalled, onStartup } from './init.js';
 import { enrichEvent } from './enrichment.js'; // Stage 3: Event Enrichment
 import { assignSession } from './session-manager.js'; // Stage 4: Session Management
+import { eventBus } from './event-bus.js'; // Stage 6: Event Bus
+import { scheduleBatch } from './buffer/batch-scheduler.js'; // Stage 6: Batch Scheduler
 
 console.log('Decision Intelligence System - Module 4.1 initialized');
 
@@ -16,11 +18,13 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 chrome.runtime.onStartup.addListener(async () => {
     console.log('Browser started, initializing extension');
     await onStartup();
+    await scheduleBatch(); // Start time-based batch checks
 });
 
 // Initialize on service worker activation (for dev reloading)
 (async () => {
     await onStartup();
+    await scheduleBatch();
 })();
 
 // Message handler for popup communication
@@ -48,26 +52,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'EVENT_BATCH') {
         const newEvents = message.payload;
 
-        // Stage 3 & 4: Enrich and assign sessions to each event before storage
+        // Stage 3 & 4: Enrich and assign sessions to each event before transmission
         Promise.all(newEvents.map(event =>
             enrichEvent(event)
                 .then(enriched => assignSession(enriched, sender.tab?.id, sender.tab?.windowId))
         ))
-            .then(enrichedEvents => chrome.storage.local.get('events').then((data) => {
-                const currentEvents = data.events || [];
-                const updatedEvents = [...currentEvents, ...enrichedEvents];
-
-                // Production Pattern: Limit buffer size (FIFO eviction at 1000 events)
-                const MAX_EVENTS = 1000;
-                const cappedEvents = updatedEvents.slice(-MAX_EVENTS);
-
-                return chrome.storage.local.set({ events: cappedEvents }).then(() => {
-                    console.log(`Background: Stored ${enrichedEvents.length} enriched events. Total buffer: ${cappedEvents.length}`);
-                    sendResponse({ success: true });
+            .then(enrichedEvents => {
+                // Stage 6: Instead of direct storage, emit to event bus
+                enrichedEvents.forEach(event => {
+                    eventBus.emit('filtered-event', event);
                 });
-            }))
+
+                console.log(`Background: Processed ${enrichedEvents.length} events and emitted to filtered-event.`);
+                sendResponse({ success: true });
+            })
             .catch(err => {
-                console.error('Background: Error enriching/storing events:', err);
+                console.error('Background: Error enriching/processing events:', err);
                 sendResponse({ success: false, error: err.message });
             });
         return true;
