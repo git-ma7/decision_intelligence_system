@@ -9,59 +9,67 @@ class RuleEngine:
     def detect_destination_exploration(self, signals: Dict) -> float:
         """
         Detects destination exploration.
-        Signals: travel blogs, YouTube travel videos, tourism websites, multiple destination entities.
+        Triggered when user is researching 'where to go'.
         """
         score = 0.0
         categories = signals.get('categories', [])
         keywords = signals.get('keywords', [])
         entities = signals.get('entities', [])
 
-        # High signals
-        has_category = 'travel_blog' in categories or 'video' in categories
-        has_keyword = any(kw in ['best places', 'things to do', 'top destinations'] for kw in keywords)
-
-        if has_category:
-            score += 0.4
+        # Essential signals (Research-oriented)
+        if 'travel_blog' in categories: score += 0.4
+        if 'video' in categories: score += 0.3
         
-        if has_keyword:
+        # Keyword signals
+        if any(kw in ['best places', 'top destinations', 'comparison', 'vs', 'where to'] for kw in keywords):
             score += 0.3
         
-        # Only add entity score if there's already some travel signal
-        if len(entities) >= 2 and (has_category or has_keyword):
-            score += 0.3
+        # Entity diversity (Researching multiple places)
+        if len(entities) >= 2:
+            score += 0.2
         
         return min(score, 1.0)
 
     def detect_transport_planning(self, signals: Dict) -> float:
         """
         Detects transport planning.
-        Signals: flight booking, train schedules, Google Maps routes, bus booking, cruise booking.
+        Triggered when user is evaluating HOW to get there (flights, trains, etc.).
         """
         score = 0.0
         categories = signals.get('categories', [])
         transport_signals = signals.get('transport_signals', [])
 
-        if any(cat in ['flight_booking', 'train_booking', 'bus_booking', 'map_navigation'] for cat in categories):
-            score += 0.6
+        # Booking intent (Highest signal)
+        if any(cat in ['flight_booking', 'train_booking', 'bus_booking'] for cat in categories):
+            score += 0.7
         
-        if len(transport_signals) >= 1:
+        # Navigation intent
+        if 'map_navigation' in categories:
             score += 0.4
+        
+        # Multimodal signals
+        if len(transport_signals) >= 1:
+            score += 0.3
         
         return min(score, 1.0)
 
     def detect_accommodation_selection(self, signals: Dict) -> float:
         """
         Detects accommodation selection.
-        Signals: hotel booking platforms, Airbnb listings, hostels, homestays.
+        Triggered when user is evaluating WHERE to stay.
         """
         score = 0.0
         categories = signals.get('categories', [])
         keywords = signals.get('keywords', [])
 
-        if 'accommodation_booking' in categories or 'hotel_search' in categories:
-            score += 0.7
+        # Booking interest
+        if 'accommodation_booking' in categories:
+            score += 0.6
+        if 'hotel_search' in categories:
+            score += 0.5
         
-        if any(kw in ['hotel', 'airbnb', 'hostel', 'stay', 'resort'] for kw in keywords):
+        # Specific keywords
+        if any(kw in ['hotel', 'airbnb', 'hostel', 'resort', 'homestay'] for kw in keywords):
             score += 0.3
         
         return min(score, 1.0)
@@ -69,20 +77,22 @@ class RuleEngine:
     def detect_activity_planning(self, signals: Dict) -> float:
         """
         Detects activity planning.
-        Signals: treks, tourist attractions, restaurants, events, local sightseeing.
+        Triggered when user is planning WHAT to do (treks, cafes, attractions).
         """
         score = 0.0
         categories = signals.get('categories', [])
         activity_signals = signals.get('activity_signals', [])
         keywords = signals.get('keywords', [])
 
-        if 'attractions' in categories or 'restaurant_search' in categories:
-            score += 0.5
+        # Attraction/Activity signals
+        if 'attractions' in categories: score += 0.5
+        if 'restaurant_search' in categories: score += 0.3
         
-        if len(activity_signals) >= 1:
-            score += 0.3
+        # Keyword-based activity intent
+        if any(kw in ['trek', 'things to do', 'sightseeing', 'cafes', 'itinerary'] for kw in keywords):
+            score += 0.4
 
-        if any(kw in ['trek', 'things to do', 'sightseeing'] for kw in keywords):
+        if len(activity_signals) >= 1:
             score += 0.2
         
         return min(score, 1.0)
