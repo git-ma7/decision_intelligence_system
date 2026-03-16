@@ -34,6 +34,7 @@ export async function initBuffer() {
  * @param {Object} event - The event object.
  */
 export async function addEvent(event) {
+    console.log(`[Buffer] addEvent triggered for ${event.type}`);
     // 1. Add to in-memory buffer
     inMemoryBuffer.push(event);
 
@@ -43,7 +44,7 @@ export async function addEvent(event) {
         events.push(event);
         await chrome.storage.local.set({ events });
 
-        console.log(`EventBuffer: Added event, total in-memory: ${inMemoryBuffer.length}, persisted: ${events.length}`);
+        console.log(`[Storage] Event persisted. Total in-memory: ${inMemoryBuffer.length}, Total in storage: ${events.length}`);
 
         // 3. Monitor storage quota
         const { usagePercentage } = await monitorQuota();

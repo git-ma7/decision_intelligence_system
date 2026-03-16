@@ -5,6 +5,7 @@ import { enrichEvent } from './enrichment.js'; // Stage 3: Event Enrichment
 import { assignSession } from './session-manager.js'; // Stage 4: Session Management
 import { eventBus } from './event-bus.js'; // Stage 6: Event Bus
 import { scheduleBatch } from './buffer/batch-scheduler.js'; // Stage 6: Batch Scheduler
+import { scrubBatch } from './privacy/privacy-pipeline.js'; // Stage 7: Privacy Pipeline
 
 console.log('Decision Intelligence System - Module 4.1 initialized');
 
@@ -25,6 +26,13 @@ chrome.runtime.onStartup.addListener(async () => {
 (async () => {
     await onStartup();
     await scheduleBatch();
+
+    // Dev Helper: Expose to global scope for console testing
+    self.dev = {
+        eventBus,
+        scrubBatch
+    };
+    console.log('Background: Dev helpers exposed to self.dev');
 })();
 
 // Message handler for popup communication
@@ -51,6 +59,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Handle incoming event batches from observers
     if (message.type === 'EVENT_BATCH') {
         const newEvents = message.payload;
+        console.log(`[ServiceWorker] Received batch of ${newEvents.length} events`);
 
         // Stage 3 & 4: Enrich and assign sessions to each event before transmission
         Promise.all(newEvents.map(event =>
@@ -60,6 +69,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             .then(enrichedEvents => {
                 // Stage 6: Instead of direct storage, emit to event bus
                 enrichedEvents.forEach(event => {
+                    console.log(`[EventBus] Emitting filtered-event for ${event.type}`);
                     eventBus.emit('filtered-event', event);
                 });
 

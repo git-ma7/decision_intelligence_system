@@ -70,9 +70,9 @@ class ObserverManager {
         };
 
         this.eventBuffer.push(event);
-        console.log(`ObserverManager: Captured ${eventType}`, payload);
+        console.log(`[Observer] Event captured: ${eventType}`, payload);
 
-        if (this.eventBuffer.length >= this.batchSize) {
+        if (this.eventBuffer.length >= 1) { // Reduced to 1 for debugging
             this.flush();
         }
     }
@@ -98,7 +98,7 @@ class ObserverManager {
                 type: 'EVENT_BATCH',
                 payload: eventsToSend
             });
-            console.log(`ObserverManager: Flushed ${eventsToSend.length} events`);
+            console.log(`[Observer] Flushed ${eventsToSend.length} events to Background`);
         } catch (error) {
             console.error('ObserverManager: Flush failed', error);
             // Put events back at the start of the buffer for retry

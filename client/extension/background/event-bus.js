@@ -58,12 +58,10 @@ class EventBus {
 export const eventBus = new EventBus();
 
 // Stage 6: Default Subscriptions
-// We use dynamic imports to avoid circular dependencies if needed, 
-// though event-buffer.js only needs the eventBus instance.
-import('./buffer/event-buffer.js').then(({ addEvent }) => {
-    eventBus.subscribe('filtered-event', (event) => {
-        addEvent(event);
-    });
+import { addEvent } from './buffer/event-buffer.js';
+
+eventBus.subscribe('filtered-event', (event) => {
+    addEvent(event);
 });
 
 eventBus.subscribe('batch-ready', async (batch) => {

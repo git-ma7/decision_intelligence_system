@@ -4,6 +4,7 @@
  */
 
 import { initAuth } from './auth.js';
+import { initBuffer } from './buffer/event-buffer.js';
 
 const DEFAULT_SCHEMA = {
     // Authentication State
@@ -59,7 +60,10 @@ export async function onStartup() {
     // 1. Initialize Auth
     await initAuth();
 
-    // 2. Refresh Session
+    // 2. Initialize Buffer
+    await initBuffer();
+
+    // 3. Refresh Session
     await initSession();
 
     // 3. Load Config (Placeholder for now)
