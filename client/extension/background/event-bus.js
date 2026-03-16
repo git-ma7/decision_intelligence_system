@@ -59,6 +59,7 @@ export const eventBus = new EventBus();
 
 // Stage 6: Default Subscriptions
 import { addEvent } from './buffer/event-buffer.js';
+import { scrubBatch } from './privacy/privacy-pipeline.js';
 
 eventBus.subscribe('filtered-event', (event) => {
     addEvent(event);
@@ -68,15 +69,33 @@ eventBus.subscribe('batch-ready', async (batch) => {
     console.log('EventBus: Batch ready received, applying privacy pipeline:', batch);
 
     try {
-        const { scrubBatch } = await import('./privacy/privacy-pipeline.js');
         const scrubbedBatch = await scrubBatch(batch);
 
-        console.log('EventBus: Batch scrubbed, emitting scrubbed-batch-ready');
+        // Ensure batch has a unique ID for tracking (Stage 8)
+        scrubbedBatch.id = scrubbedBatch.id || `batch-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+        console.log(`EventBus: Batch scrubbed (ID: ${scrubbedBatch.id}), emitting scrubbed-batch-ready`);
         eventBus.emit('scrubbed-batch-ready', scrubbedBatch);
     } catch (error) {
         console.error('EventBus: Privacy scrubbing failed', error);
-        // Fail-safe: Emit the batch even if scrubbing fails? 
-        // Better to not emit it if privacy is a hard requirement.
-        // For now, let's just log.
     }
 });
+
+
+// Stage 8: Output Integration
+import { sendBatchToModule42 } from './output/module42-interface.js';
+import { handleAck } from './output/ack-handler.js';
+import { retryBatch } from './output/retry-manager.js';
+
+eventBus.subscribe('scrubbed-batch-ready', (batch) => {
+    sendBatchToModule42(batch);
+});
+
+eventBus.subscribe('module42-ack', (batchId) => {
+    handleAck(batchId);
+});
+
+eventBus.subscribe('module42-failed', (batch) => {
+    retryBatch(batch);
+});
+
