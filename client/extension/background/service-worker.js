@@ -6,8 +6,10 @@ import { assignSession } from './session-manager.js'; // Stage 4: Session Manage
 import { eventBus } from './event-bus.js'; // Stage 6: Event Bus
 import { scheduleBatch } from './buffer/batch-scheduler.js'; // Stage 6: Batch Scheduler
 import { scrubBatch } from './privacy/privacy-pipeline.js'; // Stage 7: Privacy Pipeline
+import { initializeModule41Consumer } from '../module42/input/module41-consumer.js'; // Module 4.2 Stage 1
 
 console.log('Decision Intelligence System - Module 4.1 initialized');
+initializeModule41Consumer();
 
 // Extension installation handler
 chrome.runtime.onInstalled.addListener(async (details) => {
