@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/git-ma7/decision_intelligence_system/issues"
   },
-  "homepage": "https://github.com/git-ma7/decision_intelligence_system#readme"
+  "homepage": "https://github.com/git-ma7/decision_intelligence_system#readme",
+  "devDependencies": {
+    "vitest": "^4.1.0"
+  }
 }
