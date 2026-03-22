@@ -20,7 +20,6 @@ export async function initBuffer() {
     try {
         const { events = [] } = await chrome.storage.local.get('events');
         inMemoryBuffer = events;
-        console.log(`EventBuffer: Initialized with ${inMemoryBuffer.length} persisted events.`);
 
         // Check if the loaded events already trigger a batch
         checkBatchTrigger();
@@ -34,7 +33,6 @@ export async function initBuffer() {
  * @param {Object} event - The event object.
  */
 export async function addEvent(event) {
-    console.log(`[Buffer] addEvent triggered for ${event.type}`);
     // 1. Add to in-memory buffer
     inMemoryBuffer.push(event);
 
@@ -43,8 +41,6 @@ export async function addEvent(event) {
         const { events = [] } = await chrome.storage.local.get('events');
         events.push(event);
         await chrome.storage.local.set({ events });
-
-        console.log(`[Storage] Event persisted. Total in-memory: ${inMemoryBuffer.length}, Total in storage: ${events.length}`);
 
         // 3. Monitor storage quota
         const { usagePercentage } = await monitorQuota();
@@ -73,7 +69,6 @@ export function getBuffer() {
 export async function clearBuffer() {
     inMemoryBuffer = [];
     await chrome.storage.local.set({ events: [] });
-    console.log('EventBuffer: Buffer cleared.');
 }
 
 /**
@@ -94,7 +89,6 @@ export function checkBatchTrigger() {
     const timeTrigger = timeElapsed >= BATCH_TIME_THRESHOLD_MS;
 
     if (sizeTrigger || timeTrigger) {
-        console.log(`EventBuffer: Batch trigger met (${sizeTrigger ? 'size' : 'timeout'}). Emitting batch-ready.`);
         eventBus.emit('batch-ready', {
             events: [...inMemoryBuffer],
             trigger: sizeTrigger ? 'size' : 'timeout',

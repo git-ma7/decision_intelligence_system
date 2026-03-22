@@ -14,7 +14,6 @@ export function processBatch(batch) {
     const validEvents = filterValidEvents(events);
     
     if (validEvents.length === 0) {
-        console.log('BatchProcessor: No valid events to process.');
         return;
     }
 

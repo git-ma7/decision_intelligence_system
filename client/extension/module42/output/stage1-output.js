@@ -14,7 +14,6 @@ export function emitStage1Ready(sessionGroups, totalEvents) {
     
     try {
         eventBus.emit('module42-stage1-ready', payload);
-        console.log(`Stage1Output: Emitted module42-stage1-ready with ${totalEvents} events across ${sessionGroups.length} sessions.`);
     } catch (error) {
         console.error('Stage1Output: Failed to emit output', error);
     }

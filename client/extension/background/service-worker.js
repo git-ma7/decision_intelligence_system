@@ -9,6 +9,7 @@ import { scrubBatch } from './privacy/privacy-pipeline.js'; // Stage 7: Privacy 
 import { initializeModule41Consumer } from '../module42/input/module41-consumer.js'; // Module 4.2 Stage 1
 import '../module42/stage2/event-enricher.js'; // Module 4.2 Stage 2
 import '../module42/stage3/stage3-output.js'; // Module 4.2 Stage 3
+import '../module42/stage4/stage4-output.js'; // Module 4.2 Stage 4
 
 console.log('Decision Intelligence System - Module 4.1 initialized');
 initializeModule41Consumer();
@@ -63,7 +64,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Handle incoming event batches from observers
     if (message.type === 'EVENT_BATCH') {
         const newEvents = message.payload;
-        console.log(`[ServiceWorker] Received batch of ${newEvents.length} events`);
 
         // Stage 3 & 4: Enrich and assign sessions to each event before transmission
         Promise.all(newEvents.map(event =>
@@ -73,11 +73,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             .then(enrichedEvents => {
                 // Stage 6: Instead of direct storage, emit to event bus
                 enrichedEvents.forEach(event => {
-                    console.log(`[EventBus] Emitting filtered-event for ${event.type}`);
                     eventBus.emit('filtered-event', event);
                 });
 
-                console.log(`Background: Processed ${enrichedEvents.length} events and emitted to filtered-event.`);
                 sendResponse({ success: true });
             })
             .catch(err => {

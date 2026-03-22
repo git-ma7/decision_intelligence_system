@@ -14,6 +14,7 @@ export function analyzeSession(sessionId, events) {
     sessionId,
     metrics,
     behavioralFlags,
+    enrichedEvents: events,
     analyzedAt: Date.now()
   };
 }

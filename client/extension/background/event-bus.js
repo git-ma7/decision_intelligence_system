@@ -66,7 +66,6 @@ eventBus.subscribe('filtered-event', (event) => {
 });
 
 eventBus.subscribe('batch-ready', async (batch) => {
-    console.log('EventBus: Batch ready received, applying privacy pipeline:', batch);
 
     try {
         const scrubbedBatch = await scrubBatch(batch);
@@ -74,7 +73,6 @@ eventBus.subscribe('batch-ready', async (batch) => {
         // Ensure batch has a unique ID for tracking (Stage 8)
         scrubbedBatch.id = scrubbedBatch.id || `batch-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-        console.log(`EventBus: Batch scrubbed (ID: ${scrubbedBatch.id}), emitting scrubbed-batch-ready`);
         eventBus.emit('scrubbed-batch-ready', scrubbedBatch);
     } catch (error) {
         console.error('EventBus: Privacy scrubbing failed', error);

@@ -14,11 +14,7 @@ export function initStage3() {
             analyzeSession(session.sessionId, session.enrichedEvents)
         );
 
-        // Temp log for manual testing
-        if (analyzedSessions.length > 0) {
-            console.log("Stage3 Session Output:", analyzedSessions[0]);
-        }
-
+        // removed log
         const stage3Payload = {
             sessions: analyzedSessions,
             totalSessions: analyzedSessions.length,

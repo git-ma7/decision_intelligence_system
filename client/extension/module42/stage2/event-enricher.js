@@ -14,10 +14,7 @@ import { parseUrlIntent } from './url-intent-parser.js';
 export function initStage2Enricher() {
     eventBus.subscribe('module42-stage1-ready', (batch) => {
         try {
-            console.log(`[Stage 2] Starting enrichment for batch ${batch.batchTimestamp || Date.now()}`);
             const enrichedBatch = enrichBatch(batch);
-            
-            console.log(`[Stage 2] Submitting enriched batch containing ${enrichedBatch.totalEvents} events`);
             eventBus.emit('module42-stage2-ready', enrichedBatch);
         } catch (error) {
             console.error('[Stage 2] Enrichment failed', error);
